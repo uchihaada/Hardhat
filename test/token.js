@@ -1,5 +1,5 @@
 const{expect}=require("chai");
-const { ethers } = require("hardhat");
+// const { ethers } = require("hardhat");
 
 
 // const { ethers } = require("hardhat");
@@ -53,7 +53,7 @@ describe("Token Contract",function(){
     let addrs;
 
     beforeEach(async function(){
-        Token =await ethers.ContractFactory("Token");
+        Token =await ethers.getContractFactory("Token");
         [owner,add1,add2,...addrs]=await ethers.getSigners();
         hardhatToken =await Token.deploy();
     });
@@ -77,9 +77,31 @@ describe("Token Contract",function(){
             const add1bal=await hardhatToken.balance(add1.address);
             expect(add1bal).to.equal(5);
             
-            start from 49.00 hardhat
+            //from address1 to address2
 
-        })
-    })
+            await hardhatToken.connect(add1).transfer(add2.address,5);
+            const add2bal= await hardhatToken.balance(add2.address);
+            expect(add2bal).to.equal(5);
+        });
+        it("Should fail if sender does not have enough tokens", async function(){
+            const intialownerbal =await hardhatToken.balance(owner.address);
+            await expect(hardhatToken.connect(add1).transfer(owner.address,1)).to.be.revertedWith("Not enough tokens");
+            expect(await hardhatToken.balance(owner.address)).to.equal(intialownerbal);
+        });
+        it("Should update balances after transfers", async function() {
+            const initailownerbal=await hardhatToken.balance(owner.address);
+            await hardhatToken.transfer(add1.address,10);
+            await hardhatToken.transfer(add2.address,50);
 
-})
+            const finalownerbal=await hardhatToken.balance(owner.address);
+            expect(finalownerbal).to.equal(initailownerbal-60);
+
+            const add1bal=await hardhatToken.balance(add1.address);
+            expect(add1bal).to.equal(10);
+
+            const add2bal=await hardhatToken.balance(add2.address);
+            expect(add2bal).to.equal(50);
+        });
+    });
+
+});
