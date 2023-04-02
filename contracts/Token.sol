@@ -1,7 +1,8 @@
 //SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.5.0 <0.9.0;
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
+ import "../node_modules/hardhat/console.sol";
 
 contract  Token{
     string public name ="HardHat Token";
